@@ -1,0 +1,28 @@
+{
+  "name": "graph-prob",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gist.github.com/ccb5d55efe2247355454de5a124dd821.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gist.github.com/ccb5d55efe2247355454de5a124dd821"
+  },
+  "homepage": "https://gist.github.com/ccb5d55efe2247355454de5a124dd821",
+  "dependencies": {
+    "konva": "^1.6.1"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}
