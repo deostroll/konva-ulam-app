@@ -24,12 +24,6 @@ function Block(v) {
     });
   }
 
-  // if (v._children.length) {
-  //   v._children.forEach(function(ch){
-  //     var blk = new Block(ch);
-  //     self.add(blk);
-  //   });
-  // }
 }
 
 function Vertex(opts) {
@@ -373,34 +367,34 @@ Tree.prototype = {
   }
 };
 
-
-window.addEventListener('load', function onWindowLoad(){
-  var container = document.getElementById('container');
-  var cw = container.clientWidth;
-  var ch = innerHeight - container.offsetTop - 15;
-  var stage = new Konva.Stage({
-    container: container,
-    height: ch,
-    width: cw
-  });
-
-  var layer = new Konva.Layer();
-  var rect = new Konva.Rect({
-    height: ch,
-    width: cw,
-    stroke: 'black'
-  });
-
-  layer.add(rect);
-  stage.add(layer);
-
-  var treeLayer = new Konva.Layer({
-    draggable: true
-  });
-
-  var tree = new Tree(treeLayer);
-  stage.add(treeLayer);
-  tree.on('ready', function(){
-    console.log(tree);
-  });
-}, false)
+//
+// window.addEventListener('load', function onWindowLoad(){
+//   var container = document.getElementById('container');
+//   var cw = container.clientWidth;
+//   var ch = innerHeight - container.offsetTop - 15;
+//   var stage = new Konva.Stage({
+//     container: container,
+//     height: ch,
+//     width: cw
+//   });
+//
+//   var layer = new Konva.Layer();
+//   var rect = new Konva.Rect({
+//     height: ch,
+//     width: cw,
+//     stroke: 'black'
+//   });
+//
+//   layer.add(rect);
+//   stage.add(layer);
+//
+//   var treeLayer = new Konva.Layer({
+//     draggable: true
+//   });
+//
+//   var tree = new Tree(treeLayer);
+//   stage.add(treeLayer);
+//   tree.on('ready', function(){
+//     console.log(tree);
+//   });
+// }, false)

@@ -18,6 +18,8 @@
   },
   "homepage": "https://gist.github.com/ccb5d55efe2247355454de5a124dd821",
   "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
     "konva": "^1.6.1"
   },
   "devDependencies": {
