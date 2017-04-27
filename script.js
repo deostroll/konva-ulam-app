@@ -232,75 +232,81 @@ Tree.prototype = {
 
     visit(vertexes[0]);
 
-    for (var i = 0; i <= LEVEL_MAX; i++) {
+    for (var i = 1; i <= LEVEL_MAX; i++) {
       var levelBlocks = blocks.filter(function(b){
         return b.y === i;
       });
 
-      if (i === 0) {
-        //! 0th level
+      var parents = levelBlocks.map(function(b){
+        return b.parent;
+      }).filter(function(b, idx, arr){
+        return arr.indexOf(b) === idx;
+      });
 
-        console.assert(levelBlocks.length === 1);
+      parents.forEach(function(p){
+        var parentX = p.x;
+        var size = p.childs.length;
+        var halfLength = Math.ceil(size/2);
+        // parentX += halfLength;
 
-      }
-      else {
-        var parentsAtLevel = levelBlocks.map(function(x){
-          return x.parent;
-        }).filter(function(x, i, arr){
-          return arr.indexOf(x) === i
-        });
-
-        var groupLength = parentsAtLevel.length;
-
-        for(var i = 0; i < groupLength; i++) {
-          var groupBlocks = levelBlocks.filter(function(x){
-            return x.parent === parentsAtLevel[i];
-          });
-          if (groupBlocks.length === 1) {
-            groupBlocks.forEach(function(blk){
-              blk.x = parentsAtLevel[i].x;
-            });
+        for(var j = 0, offset = 0; j < size; j++) {
+          if (j === halfLength && size % 2 === 0) {
+            offset = 1;
           }
-          else if(groupBlocks.length % 2 === 0) {
-            //! group length even
-            var halfLength = groupBlocks.length/2;
-            var j;
-            for(j = 0; j < halfLength; j++) {
-              groupBlocks[j].x = j;
-            }
-            groupBlocks[0].parent.x += halfLength;
+          p.childs[j].x = parentX + j + offset;
+        }
 
-            for(j = halfLength; j < groupBlocks.length; j++) {
-              groupBlocks[j].x = j + 1;
-            }
-          }//end if-else groupBlocks.length % 2 === 0
-          else {
-            //! group length odd
-            var halfLength = Math.floor(groupBlocks.length/2);
+        if (size % 2 === 0) {
+          p.x = parentX + halfLength;
+        }
+        else {
+          p.x = p.childs[halfLength - 1].x;
+        }
 
-            var j;
+      }); //parent foreach
 
-            for(j = 0; j < halfLength; j++) {
-              groupBlocks[j].x = j;
-            }
-
-            groupBlocks[halfLength].x = ++j;
-            groupBlocks[halfLength].parent.x += halfLength;
-
-            for(; j < groupBlocks.length; j++) {
-              groupBlocks[j].x = j + 1;
-            }
-
-          }//end if-else
-
-        } // end for
-
-
-
-      } //end if-else i === 0
     }//end for level iteration
 
     console.log(blocks.toString());
+
+    var group = new Konva.Group();
+    var r = vertexes[0].getClientRect();
+    var unitWidth = r.width + 10;
+    var unitHeight = r.height + 50;
+
+    for(var y = 0; y <= LEVEL_MAX; y++) {
+      var levelBlocks = blocks.filter(function(x){
+        return x.y === y;
+      });
+      var start = { x: 100, y: 100 };
+      levelBlocks.forEach(function(b, idx){
+        var v = b.vertex;
+        group.add(v);
+        var x = unitWidth * b.x + start.x;
+        var y = unitHeight * b.y + start.y;
+        v.position({
+          x: x, y: y
+        })
+      }); //levelBlocks.forEach
+    } //end-for
+
+    var edges = this._edges;
+
+    for(var i = 0, j = edges.length; i < j; i++) {
+      var edge = edges[i];
+      var orignal = {
+        from: edge.from.position(),
+        to: edge.to.position()
+      };
+
+
+    }
+
+    this._layer.removeChildren();
+
+    this._layer.add(group);
+
+    this._draw();
 
   },
 
@@ -331,7 +337,7 @@ window.addEventListener('load', function onWindowLoad(){
   stage.add(layer);
 
   var treeLayer = new Konva.Layer({
-    draggable: true
+    draggable: false
   });
 
   var tree = new Tree(treeLayer);
