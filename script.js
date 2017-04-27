@@ -277,17 +277,19 @@ Tree.prototype = {
           else {
             //! group length odd
             var halfLength = Math.floor(groupBlocks.length/2);
-            for(var j = 0, k = groupBlocks.length; j < k; j++) {
-              if (j < halfLength) {
-                groupBlocks[i].left = j;
-              }
-              else if(j > halfLength) {
-                groupBlocks[i].left = j + 1;
-              }
-              else {
-                groupBlocks[i].parent.left += halfLength;
-              }
-            }//end-for
+
+            var j;
+
+            for(j = 0; j < halfLength; j++) {
+              groupBlocks[j].x = j;
+            }
+
+            groupBlocks[halfLength].x = ++j;
+            groupBlocks[halfLength].parent.x += halfLength;
+
+            for(; j < groupBlocks.length; j++) {
+              groupBlocks[j].x = j + 1;
+            }
 
           }//end if-else
 
