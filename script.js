@@ -212,7 +212,8 @@ Tree.prototype = {
   arrange: function() {
     var vertexes = this._vertexes.slice();
 
-    var LEVEL_MAX = -1
+    var LEVEL_MAX = -1;
+
     var blocks = vertexes.map(function(x){
       if (LEVEL_MAX < x._level) {
         LEVEL_MAX = x._level;
@@ -232,10 +233,27 @@ Tree.prototype = {
 
     visit(vertexes[0]);
 
+    var graphArray = [blocks[0]];
+
+    var expandRight = function(x, y, length) {
+      graphArray.filter(function(b){
+        return b.x >= x && b.y <= y;
+      }).forEach(function(b){
+        if(b.y === y && y && b.x > x) {
+          b.x += length * 2;
+        }
+        else {
+          b.x += length;
+        }
+      });
+    };
+
     for (var i = 1; i <= LEVEL_MAX; i++) {
       var levelBlocks = blocks.filter(function(b){
         return b.y === i;
       });
+
+      graphArray = graphArray.concat(levelBlocks);
 
       var parents = levelBlocks.map(function(b){
         return b.parent;
@@ -245,9 +263,9 @@ Tree.prototype = {
 
       parents.forEach(function(p){
         var parentX = p.x;
+
         var size = p.childs.length;
         var halfLength = Math.ceil(size/2);
-        // parentX += halfLength;
 
         for(var j = 0, offset = 0; j < size; j++) {
           if (j === halfLength && size % 2 === 0) {
@@ -256,20 +274,17 @@ Tree.prototype = {
           p.childs[j].x = parentX + j + offset;
         }
 
-        if (size % 2 === 0) {
-          p.x = parentX + halfLength;
-        }
-        else {
-          p.x = p.childs[halfLength - 1].x;
-        }
+        expandRight(p.x, p.y, (size % 2) ? halfLength - 1 : halfLength);
 
       }); //parent foreach
 
     }//end for level iteration
 
-    console.log(blocks.toString());
+    console.log(blocks.join('\r\n'));
 
-    var group = new Konva.Group();
+    var group = new Konva.Group({
+      x: 100, y: 100
+    });
     var r = vertexes[0].getClientRect();
     var unitWidth = r.width + 10;
     var unitHeight = r.height + 50;
@@ -278,12 +293,12 @@ Tree.prototype = {
       var levelBlocks = blocks.filter(function(x){
         return x.y === y;
       });
-      var start = { x: 100, y: 100 };
+
       levelBlocks.forEach(function(b, idx){
         var v = b.vertex;
         group.add(v);
-        var x = unitWidth * b.x + start.x;
-        var y = unitHeight * b.y + start.y;
+        var x = unitWidth * b.x;
+        var y = unitHeight * b.y;
         v.position({
           x: x, y: y
         })
@@ -291,16 +306,62 @@ Tree.prototype = {
     } //end-for
 
     var edges = this._edges;
-
+    var d = r.width / 2;
+    var pi = Math.PI;
     for(var i = 0, j = edges.length; i < j; i++) {
       var edge = edges[i];
-      var orignal = {
+      var original = {
         from: edge.from.position(),
         to: edge.to.position()
       };
+      if (original.to.x === original.from.x) {
+        var arrow = new Konva.Arrow({
+          x: original.from.x,
+          y: original.from.y + d,
+          points: [
+            0,0,
+            0, original.to.y - original.from.y - 2*d
+          ],
+          fill: 'black',
+          stroke: 'black',
+          pointerWidth: 10,
+          pointerLength: 10
+        });
+        group.add(arrow);
+      }
+      else {
+        // var m = (original.to.y - original.from.y) / (original.to.x - original.from.x);
+        var theta = Math.atan2(original.to.y - original.from.y, original.to.x - original.from.x);
+        var final = {
+          from: {
+            x: original.from.x + d * Math.cos(theta),
+            y: original.from.y + d * Math.sin(theta)
+          },
+          to: {
+            x: original.to.x - d * Math.cos(theta),
+            y: original.to.y - d * Math.sin(theta)
+          }
+        };
 
 
-    }
+        var arrow = new Konva.Arrow({
+          x: final.from.x,
+          y: final.from.y,
+          points: [
+            0,0,
+            final.to.x - final.from.x, final.to.y - final.from.y
+          ],
+          fill: 'black',
+          stroke: 'black',
+          pointerWidth: 10,
+          pointerLength: 10
+        });
+
+
+        group.add(arrow);
+      }
+
+    }//end for
 
     this._layer.removeChildren();
 
@@ -337,7 +398,7 @@ window.addEventListener('load', function onWindowLoad(){
   stage.add(layer);
 
   var treeLayer = new Konva.Layer({
-    draggable: false
+    draggable: true
   });
 
   var tree = new Tree(treeLayer);
