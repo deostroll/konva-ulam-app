@@ -235,17 +235,14 @@ Tree.prototype = {
 
     var graphArray = [blocks[0]];
 
-    var expandRight = function(x, y, length) {
+    var expandRight = function(p, length) {
       graphArray.filter(function(b){
-        return b.x >= x && b.y <= y;
+        return b.x > p.x && b.y <= p.y;
       }).forEach(function(b){
-        if(b.y === y && y && b.x > x) {
-          b.x += length * 2;
-        }
-        else {
-          b.x += length;
-        }
+
+        b.x += length;
       });
+      p.x = (length % 2 === 0) ? (p.childs[p.childs.length - 1].x - 1) : (p.childs[Math.floor(length/2)].x)
     };
 
     for (var i = 1; i <= LEVEL_MAX; i++) {
@@ -274,7 +271,7 @@ Tree.prototype = {
           p.childs[j].x = parentX + j + offset;
         }
 
-        expandRight(p.x, p.y, (size % 2) ? halfLength - 1 : halfLength);
+        expandRight(p, size);
 
       }); //parent foreach
 
@@ -324,8 +321,8 @@ Tree.prototype = {
           ],
           fill: 'black',
           stroke: 'black',
-          pointerWidth: 10,
-          pointerLength: 10
+          pointerWidth: 5,
+          pointerLength: 5
         });
         group.add(arrow);
       }
@@ -353,8 +350,8 @@ Tree.prototype = {
           ],
           fill: 'black',
           stroke: 'black',
-          pointerWidth: 10,
-          pointerLength: 10
+          pointerWidth: 5,
+          pointerLength: 5
         });
 
 
