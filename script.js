@@ -103,7 +103,7 @@ function Tree(layer) {
     var cw, ch;
     cw = self._dim.cw = layer.parent.getWidth();
     ch = self._dim.ch = layer.parent.getHeight();
-    self.add(cw/2, ch/2);
+    // self.add(cw/2, ch/2);
     self._stage = layer.parent;
     self._init();
     self._eventCache['ready'].call(self);
@@ -140,33 +140,7 @@ Tree.prototype = {
   },
 
   _init: function() {
-    var self = this;
-    var stage = self._stage;
-    var selected = null;
-    stage.on('click', function onStageClicked(e){
-      if (!selected) {
-        if (e.target.parent.className === 'Vertex') {
-          selected = e.target.parent;
-          selected.activate();
-        }
-        else {
-          //create new vertex
-          var pos = stage.getPointerPosition();
-          self.add(pos.x, pos.y);
-        }
-      }
-      else if (e.target.parent.className === 'Vertex' && selected !== e.target.parent) {
-        selected.deactivate();
-        var newVertex = e.target.parent;
-        self.connect(selected, newVertex);
-        selected = null;
-      }
-      else {
-        selected.deactivate();
-        selected = null;
-      }
-
-    });
+    //doing nothing here
   },
 
   _draw: function() {
@@ -181,10 +155,10 @@ Tree.prototype = {
         from: parent,
         to: child
       });
-      console.log(this.isTree());
-      if (this.isTree()) {
-        this.arrange();
-      }
+      // console.log(this.isTree());
+      // if (this.isTree()) {
+      //   this.arrange();
+      // }
     }
   },
 
@@ -204,6 +178,8 @@ Tree.prototype = {
   },
 
   arrange: function() {
+    var self = this;
+
     var vertexes = this._vertexes.slice();
 
     var LEVEL_MAX = -1;
@@ -230,13 +206,112 @@ Tree.prototype = {
     var graphArray = [blocks[0]];
 
     var expandRight = function(p, length) {
+      var offset = length % 2 ? length: length + 1;
       graphArray.filter(function(b){
         return b.x > p.x && b.y <= p.y;
       }).forEach(function(b){
 
-        b.x += length;
+        b.x += offset - 1;
       });
-      p.x = (length % 2 === 0) ? (p.childs[p.childs.length - 1].x - 1) : (p.childs[Math.floor(length/2)].x)
+      // p.x = (length % 2 === 0) ? (p.childs[p.childs.length - 1].x - 2) : (p.childs[Math.floor(length/2)].x)
+      // p.x += (length % 2) ? Math.floor(offset/2)
+      if (length % 2 === 0 && length === 2) {
+        p.x += 1;
+      }
+      else if(length % 2 === 0) {
+        p.x += length / 2;
+      }
+      else {
+        p.x = p.childs[Math.floor(length/2)].x;
+      }
+    };
+
+    var drawBlocks = function(levelBlocks) {
+
+      var group = new Konva.Group({
+        x: 100, y: 100
+      });
+      var r = vertexes[0].getClientRect();
+      var unitWidth = r.width + 10;
+      var unitHeight = r.height + 50;
+
+      for(var y = 0; y <= LEVEL_MAX; y++) {
+        var levelBlocks = blocks.filter(function(x){
+          return x.y === y;
+        });
+
+        levelBlocks.forEach(function(b, idx){
+          var v = b.vertex;
+          group.add(v);
+          var x = unitWidth * b.x;
+          var y = unitHeight * b.y;
+          v.position({
+            x: x, y: y
+          })
+        }); //levelBlocks.forEach
+      } //end-for
+
+      var edges = self._edges;
+      var d = r.width / 2;
+      var pi = Math.PI;
+      for(var i = 0, j = edges.length; i < j; i++) {
+        var edge = edges[i];
+        var original = {
+          from: edge.from.position(),
+          to: edge.to.position()
+        };
+        if (original.to.x === original.from.x) {
+          var arrow = new Konva.Arrow({
+            x: original.from.x,
+            y: original.from.y + d,
+            points: [
+              0,0,
+              0, original.to.y - original.from.y - 2*d
+            ],
+            fill: 'black',
+            stroke: 'black',
+            pointerWidth: 5,
+            pointerLength: 5
+          });
+          group.add(arrow);
+        }
+        else {
+          // var m = (original.to.y - original.from.y) / (original.to.x - original.from.x);
+          var theta = Math.atan2(original.to.y - original.from.y, original.to.x - original.from.x);
+          var final = {
+            from: {
+              x: original.from.x + d * Math.cos(theta),
+              y: original.from.y + d * Math.sin(theta)
+            },
+            to: {
+              x: original.to.x - d * Math.cos(theta),
+              y: original.to.y - d * Math.sin(theta)
+            }
+          };
+
+
+          var arrow = new Konva.Arrow({
+            x: final.from.x,
+            y: final.from.y,
+            points: [
+              0,0,
+              final.to.x - final.from.x, final.to.y - final.from.y
+            ],
+            fill: 'black',
+            stroke: 'black',
+            pointerWidth: 5,
+            pointerLength: 5
+          });
+
+
+          group.add(arrow);
+        }
+
+      }//end for
+
+      self._layer.add(group);
+
+      self._draw();
     };
 
     for (var i = 1; i <= LEVEL_MAX; i++) {
@@ -273,97 +348,54 @@ Tree.prototype = {
 
     console.log(blocks.join('\r\n'));
 
-    var group = new Konva.Group({
-      x: 100, y: 100
-    });
-    var r = vertexes[0].getClientRect();
-    var unitWidth = r.width + 10;
-    var unitHeight = r.height + 50;
-
-    for(var y = 0; y <= LEVEL_MAX; y++) {
-      var levelBlocks = blocks.filter(function(x){
-        return x.y === y;
-      });
-
-      levelBlocks.forEach(function(b, idx){
-        var v = b.vertex;
-        group.add(v);
-        var x = unitWidth * b.x;
-        var y = unitHeight * b.y;
-        v.position({
-          x: x, y: y
-        })
-      }); //levelBlocks.forEach
-    } //end-for
-
-    var edges = this._edges;
-    var d = r.width / 2;
-    var pi = Math.PI;
-    for(var i = 0, j = edges.length; i < j; i++) {
-      var edge = edges[i];
-      var original = {
-        from: edge.from.position(),
-        to: edge.to.position()
-      };
-      if (original.to.x === original.from.x) {
-        var arrow = new Konva.Arrow({
-          x: original.from.x,
-          y: original.from.y + d,
-          points: [
-            0,0,
-            0, original.to.y - original.from.y - 2*d
-          ],
-          fill: 'black',
-          stroke: 'black',
-          pointerWidth: 5,
-          pointerLength: 5
-        });
-        group.add(arrow);
-      }
-      else {
-        // var m = (original.to.y - original.from.y) / (original.to.x - original.from.x);
-        var theta = Math.atan2(original.to.y - original.from.y, original.to.x - original.from.x);
-        var final = {
-          from: {
-            x: original.from.x + d * Math.cos(theta),
-            y: original.from.y + d * Math.sin(theta)
-          },
-          to: {
-            x: original.to.x - d * Math.cos(theta),
-            y: original.to.y - d * Math.sin(theta)
-          }
-        };
-
-
-        var arrow = new Konva.Arrow({
-          x: final.from.x,
-          y: final.from.y,
-          points: [
-            0,0,
-            final.to.x - final.from.x, final.to.y - final.from.y
-          ],
-          fill: 'black',
-          stroke: 'black',
-          pointerWidth: 5,
-          pointerLength: 5
-        });
-
-
-        group.add(arrow);
-      }
-
-    }//end for
-
-    this._layer.removeChildren();
-
-    this._layer.add(group);
-
-    this._draw();
+    drawBlocks(levelBlocks);
 
   },
 
   toString: function() {
     return this._vertexes.toString();
+  },
+
+  loadFromJson: function(graph) {
+    var self = this;
+
+    self._layer.removeChildren();
+
+    var vertexes = graph.v.map(function(v){
+      var v = new Vertex({
+        x: 0,
+        y: 0,
+        c: {
+          radius: 15,
+          fill: 'lightgreen',
+          stroke: 'black',
+          strokeWidth: 1
+        },
+        t: {
+          text: v.toString(),
+          fontSize: 12,
+          fill:'black'
+        },
+        tree: self
+      });
+      return v;
+    });
+
+    self._vertexes = vertexes;
+
+    graph.e.forEach(function(edge){
+      var child = self._vertexes[edge[1]];
+      var parent = self._vertexes[edge[0]];
+
+      self.connect(child, parent);
+    });
+
+    if (self.isTree()) {
+      self.arrange();
+    }
+    else {
+      console.log('Not a tree');
+    }
   }
 };
 

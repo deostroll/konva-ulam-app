@@ -2,13 +2,22 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Graph Generate</title>
-    <link rel="stylesheet" href="node_modules/boostrap/dist/css/bootstrap.css">
+    <title>Tree Drawing</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div class="envelope">
-      <div id="container">
-
+    <div class="container">
+      <div class="">
+        <button type="button" id="btnOpen" class="btn btn-default">Open...</button>
+        <a href="javascript:void(0)" id="toggle-preview"><small>show</small></a>
+      </div>
+      <input type="file" name="" id="fileOpen" style="display:none">
+      <div id="json-preview-container" class="well">
+        <textarea id="json-preview"></textarea>
+        <button type="button" id="btnDraw" class="btn btn-default btn-xs-small">Draw</button>
+      </div>
+      <div id="region">
       </div>
     </div>
     <script src="node_modules/jquery/dist/jquery.js" charset="utf-8"></script>

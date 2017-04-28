@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 
     watch: {
       dev: {
-        files: ['index.html', 'style.css', 'script.js'],
+        files: ['index.html', 'style.css', '*.js'],
         options: {
           livereload: '<%= connect.serve.options.livereload %>'
         }
