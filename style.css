@@ -6,11 +6,6 @@ body {
   border: 1px solid black;
 }
 
-#json-preview {
-  width: 100%;
-  height: 205px;
-}
-
-#json-preview-container {
+#params {
   display:none;
 }

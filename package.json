@@ -1,7 +1,7 @@
 {
-  "name": "konva-tree-draw",
+  "name": "konva-ulam-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "collatz conjecture app",
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,8 +11,8 @@
     "url": "git+https://gist.github.com/ccb5d55efe2247355454de5a124dd821.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "deostroll",
+  "license": "MIT",
   "bugs": {
     "url": "https://gist.github.com/ccb5d55efe2247355454de5a124dd821"
   },
