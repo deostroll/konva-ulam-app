@@ -206,24 +206,41 @@ Tree.prototype = {
     var graphArray = [blocks[0]];
 
     var expandRight = function(p, length) {
-      var offset = length % 2 ? length: length + 1;
-      graphArray.filter(function(b){
-        return b.x > p.x && b.y <= p.y;
-      }).forEach(function(b){
-
-        b.x += offset - 1;
-      });
-      // p.x = (length % 2 === 0) ? (p.childs[p.childs.length - 1].x - 2) : (p.childs[Math.floor(length/2)].x)
-      // p.x += (length % 2) ? Math.floor(offset/2)
-      if (length % 2 === 0 && length === 2) {
-        p.x += 1;
+      var offset;
+      if (length === 1) {
+        offset = 0;
       }
       else if(length % 2 === 0) {
-        p.x += length / 2;
+        offset = length;
       }
       else {
-        p.x = p.childs[Math.floor(length/2)].x;
+        offset = length - 1;
       }
+
+      if (offset > 0) {
+        graphArray.filter(function(b){
+          return b.x > p.x && b.y <= p.y;
+        }).forEach(function(b){
+          b.x += offset;
+        });
+      }
+
+      // p.x += Math.floor(offset / 2);
+      var parentOffset = Math.floor(offset/2);
+
+      if (p.y > 0) {
+        graphArray.filter(function(b) {
+          return b.x === p.x && b.y < p.y;
+        })
+        .forEach(function(b){
+          b.x += parentOffset;
+        });
+      }
+      // else {
+      //   p.x += parentOffset;
+      // }
+      p.x += parentOffset;
+
     };
 
     var drawBlocks = function(levelBlocks) {
