@@ -22,6 +22,32 @@ $(function(){
   };
 
   tree.on('ready', function onTreeReady(){
+    $('#saveBtn').click(function(){
+      var a = document.createElement('a');
+      var layer = tree._layer;
+      var rect = layer.getClientRect();
+      var div = document.createElement('div');
+      var s = new Konva.Stage({
+        container: div,
+        height: rect.height + 15,
+        width: rect.width + 15
+      });
+      var img = new Image;
+      $(img).bind('load', function(){
+        var i = new Konva.Image({
+          image: img
+        });
+        var l = layer.clone();
+        l.offset({
+          x: -15,
+          y: -15
+        })
+        s.add(l);
+        var c = s.toDataURL();
+        window.open(c);
+      }).attr('src', layer.toDataURL())
+
+    }).attr('href', 'javascript:void(0)');
 
     var generateCollatz = function(iterations) {
       tree._vertexes = [];
@@ -112,30 +138,6 @@ $(function(){
 
       tree.arrange();
 
-      var layer = tree._layer;
-
-      var layerRect = layer.getClientRect();
-      console.log('Layer:', layerRect);
-      console.log('Stage:', tree._stage.width(), tree._stage.height());
-      var aspect = layerRect.width/layerRect.height;
-
-      var factor = 1;
-
-      if (layerRect.width > layerRect.height) {
-        if (layerRect.width > tree._stage.width()) {
-          factor = tree._stage.width() / (layerRect.width + layerRect.x);
-        }
-      }
-      else {
-        if (layerRect.height > tree._stage.height()) {
-          factor = tree._stage.height()/(layerRect.height + layerRect.y);
-        }
-      }
-
-      layer.scaleX(factor);
-      layer.scaleY(factor);
-      layer.draw();
-
     }; //end generateCollatz Fn
 
     var $settings = $('#settings').click(function(){
@@ -160,7 +162,7 @@ $(function(){
 
     $('#btnGenerate').click(function() {
       var iterations;
-      if ($iterLevel.val() === -1) {
+      if ($iterLevel.val() === "-1") {
         try {
           iterations = parseInt($cust.val())
         } catch (e) {
@@ -176,7 +178,7 @@ $(function(){
 
     });
 
-    generateCollatz(15);
+    generateCollatz(25);
   });
 
   stage.add(layer);

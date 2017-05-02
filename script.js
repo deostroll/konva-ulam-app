@@ -246,7 +246,7 @@ Tree.prototype = {
     var drawBlocks = function(levelBlocks) {
 
       var group = new Konva.Group({
-        x: 100, y: 100
+        // x: 100, y: 100
       });
       var r = vertexes[0].getClientRect();
       var unitWidth = r.width + 10;
