@@ -326,6 +326,13 @@ Tree.prototype = {
 
       }//end for
 
+      var iterText = new Konva.Text({
+        text: 'Iterations: ' + (LEVEL_MAX + 1),
+        fontSize: 48,
+        fill: 'black'
+      });
+      group.add(iterText);
+      
       self._layer.add(group);
 
       self._draw();
